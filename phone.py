@@ -8,9 +8,6 @@ phoneNumbers = [
     {'name': "Bob Loblaw"},{'number': '555-555-5555'},
     {'name': "Test"},{'number': '555-555-5555'},
 ]
-attempts = 4
-difficulty = 9
-
 
 def clearScreen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -30,6 +27,29 @@ def loadSecretsFile():
         secrets = yaml.safe_load(f)
         phoneNumbers = secrets['phoneNumbers']
     print(f"Loaded {len(phoneNumbers)} names/numbers")
+
+def menuSelect(numbers):
+    msg = ''
+    while True:
+        i = 0
+        clearScreen()
+        print(msg, end='')
+        print('Please choose the number to memorize.')
+        for person in numbers:
+            print(f"\t{i+1}) {person['name']}") 
+            i+=1
+        selection = getch.getch()
+        try:
+            selection = int(selection)
+        except ValueError:
+            selection = -1
+        if not type(selection) == type(1):
+            msg = f'Error: Please enter a number from below.\n'
+            continue
+        if not selection <= len(numbers) or selection < 1:
+            msg = f'Error: Please enter a number from 1-{len(numbers)}\n'
+            continue
+        return numbers[selection-1]
 
 
 def getMissing(random_count):
@@ -70,7 +90,7 @@ def printLevelMessage(level, name):
     msg += f' of {name}\'s Phone Number.'
     print(msg)
 
-def game(name, number, attempts, difficulty):
+def game(name, number, attempts = 4, difficulty = 0):
     
     number = str(number)
     number = number.replace("-","")
@@ -109,5 +129,10 @@ def game(name, number, attempts, difficulty):
     print(msg)
 
 loadSecretsFile()
-for each in phoneNumbers:
-    game(each['name'], each['number'], attempts, difficulty)
+
+playAgain = 'y'
+while playAgain == 'y':
+    selection = menuSelect(phoneNumbers)
+    game(selection['name'],selection['number'])
+    print('Play again? [y,N]: ')
+    playAgain = getch.getch()
