@@ -142,10 +142,10 @@ def game(name, number, attempts = 4, difficulty = 0):
 
 def checkShowNumber(name,number):
     clearScreen()
-    show = 'n'
-    print('Show the number before we start? [N,y]')
+    show = 'y'
+    print('Show the number before we start? [Y,n]')
     show = getch.getch()
-    if show == 'y':
+    if show != 'n':
         clearScreen()
         print(f'{name}\'s Phone Number is: {number}')
         print('Press any key when Ready to Play')
