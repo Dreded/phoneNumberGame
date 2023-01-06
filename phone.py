@@ -4,11 +4,6 @@ import os
 import getch
 import yaml
 
-phoneNumbers = [
-    {'name': "Bob Loblaw"},{'number': '555-555-5555'},
-    {'name': "Test"},{'number': '555-555-5555'},
-]
-
 def clearScreen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -20,7 +15,7 @@ def loadSecretsFile():
 
     if not fileExists(secretsFileName):
         print('No secrets file, using example data.')
-        return
+        secretsFileName = 'secrets.yml.example'
 
     global phoneNumbers
     with open(secretsFileName,'r') as f:
@@ -81,6 +76,20 @@ def getPhoneNumber(rand, number):
     
     return phoneNumber
 
+def cleanNumber(number):
+    number = str(number)
+    number = number.replace("-","")
+    number = number.replace(" ","")
+    number = number.replace("(","")
+    number = number.replace(")","")
+    if len(number) < 10 or len(number) > 10:
+        clearScreen()
+        print('ERROR: The Phone Number must be 10 digits.')
+        print(f'Loaded: {number} which is {len(number)} digits')
+        os._exit(1)
+    number = list(map(int,number))
+    return number
+
 def printLevelMessage(level, name):
     msg = ''
     if level == 1:
@@ -92,9 +101,7 @@ def printLevelMessage(level, name):
 
 def game(name, number, attempts = 4, difficulty = 0):
     
-    number = str(number)
-    number = number.replace("-","")
-    number = list(map(int,number))
+    number = cleanNumber(number)
     lose = False
     while difficulty < 10:
         difficulty += 1
@@ -104,19 +111,24 @@ def game(name, number, attempts = 4, difficulty = 0):
             clearScreen()
             printLevelMessage(difficulty, name)
             print(getPhoneNumber(missingNums, number))
-            if msg != '':
-                print(msg)
+            print(msg, end='')
+            msg = ''
+
             print('What is the FIRST missing Digit?')
             while True:
                 key = getch.getch()
-                if int(key) == number[missingNums[0]]:
-                    missingNums.pop(0)
+                try:
+                    if int(key) == number[missingNums[0]]:
+                        missingNums.pop(0)
+                        break
+                except ValueError:
+                    msg = 'ERROR: Please enter a digit from 0-9.\n'
                     break
 
                 else:
                     attempts -= 1
                     if attempts != 0:
-                        msg = f'Try again! {attempts} attempt(s) left.'
+                        msg = f'Try again! {attempts} attempt(s) left.\n'
                     else:
                         lose = True
                     break
@@ -128,11 +140,25 @@ def game(name, number, attempts = 4, difficulty = 0):
         msg = f'Correct {name}\'s Phone Number is: {getPhoneNumber([-1], number)}'
     print(msg)
 
+def checkShowNumber(name,number):
+    clearScreen()
+    show = 'n'
+    print('Show the number before we start? [N,y]')
+    show = getch.getch()
+    if show == 'y':
+        clearScreen()
+        print(f'{name}\'s Phone Number is: {number}')
+        print('Press any key when Ready to Play')
+        getch.getch()
+
 loadSecretsFile()
 
 playAgain = 'y'
 while playAgain == 'y':
     selection = menuSelect(phoneNumbers)
-    game(selection['name'],selection['number'])
+    name = selection['name']
+    number = selection['number']
+    checkShowNumber(name,number)
+    game(name,number,difficulty=9)
     print('Play again? [y,N]: ')
     playAgain = getch.getch()
