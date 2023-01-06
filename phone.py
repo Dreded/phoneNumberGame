@@ -159,6 +159,6 @@ while playAgain == 'y':
     name = selection['name']
     number = selection['number']
     checkShowNumber(name,number)
-    game(name,number,difficulty=9)
+    game(name,number)
     print('Play again? [y,N]: ')
     playAgain = getch.getch()
