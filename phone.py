@@ -135,7 +135,7 @@ def game(name, number, attempts = 4, difficulty = 0):
         
     clearScreen()
     if lose:
-        msg = 'You Lose!'
+        msg = f'You Lose! Please study, {name}\'s Phone Number is: {getPhoneNumber([-1], number)}'
     else:
         msg = f'Correct {name}\'s Phone Number is: {getPhoneNumber([-1], number)}'
     print(msg)
